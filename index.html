@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>THE MONOLITH 利用登録</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%2305060B%22/%3E%3Crect x=%2213%22 y=%225%22 width=%226%22 height=%2222%22 fill=%22%233E9E8E%22/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #05060B;
+      --panel: #0B0E15;
+      --field: #0F131B;
+      --line: #1F2632;
+      --line-strong: #2C3542;
+      --text: #F2F7FA;
+      --sub: #A7B4BC;
+      --muted: #8A9BA3;
+      --teal: #3E9E8E;
+      --teal-hi: #56B8A7;
+      --sage: #A7C3BE;
+      --error: #F08A7E;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+      font-size: 16px;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ---------- 背景：光とモノリス ---------- */
+    .bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(900px 600px at 12% 8%, rgba(62,158,142,.16), transparent 60%),
+        radial-gradient(700px 500px at 95% 100%, rgba(62,158,142,.08), transparent 60%);
+    }
+    .bg::after {
+      content: ""; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse at 30% 30%, #000 0%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at 30% 30%, #000 0%, transparent 70%);
+    }
+    .slab {
+      position: fixed; z-index: 0; pointer-events: none;
+      left: 6vw; bottom: -6vh; width: 120px; height: 78vh;
+      background: linear-gradient(180deg, #161B24 0%, #0A0D13 55%, var(--ink) 100%);
+      border: 1px solid rgba(167,195,190,.10);
+      border-bottom: 0;
+      box-shadow: 0 0 120px rgba(62,158,142,.10), inset 1px 0 0 rgba(255,255,255,.05);
+      opacity: .55;
+    }
+
+    /* ---------- レイアウト ---------- */
+    .wrap {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      max-width: 1120px; margin: 0 auto;
+      padding: 56px 24px 40px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      align-content: center;
+    }
+    @media (min-width: 920px) {
+      .wrap { grid-template-columns: 1.05fr 1fr; gap: 72px; align-items: center; padding: 64px 40px; }
+    }
+
+    /* ---------- 左：ブランド ---------- */
+    .eyebrow {
+      font-family: Inter, sans-serif; font-weight: 700;
+      font-size: 12px; letter-spacing: .28em; color: var(--muted);
+      margin: 0 0 18px;
+    }
+    .brand {
+      font-family: Inter, sans-serif; font-weight: 800;
+      font-size: clamp(40px, 7vw, 68px); line-height: 1.02;
+      letter-spacing: .02em; margin: 0;
+    }
+    .rule { width: 64px; height: 3px; background: var(--teal); border-radius: 2px; margin: 28px 0 24px; }
+    .audience {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 15px; font-weight: 700; color: var(--sage);
+      margin: 0 0 14px;
+    }
+    .audience::before {
+      content: ""; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--teal); box-shadow: 0 0 0 4px rgba(62,158,142,.18);
+    }
+    .lead { color: var(--sub); font-size: 15px; margin: 0; max-width: 34em; }
+
+    /* ---------- 右：カード ---------- */
+    .card {
+      background: linear-gradient(180deg, rgba(20,25,34,.92), rgba(11,14,21,.94));
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 32px 28px 28px;
+      box-shadow: 0 30px 80px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(8px);
+    }
+    @media (min-width: 560px) { .card { padding: 40px 40px 36px; } }
+    /* PCでは画面を切り替えてもカードの高さが変わらないように固定 */
+    @media (min-width: 920px) {
+      .card { min-height: 580px; display: flex; flex-direction: column; }
+      .card .view.show { flex: 1; }
+      #view-done.show { display: flex; align-items: center; justify-content: center; }
+    }
+
+    /* ステップ表示 */
+    .steps { display: flex; align-items: center; gap: 10px; margin: 0 0 30px; padding: 0; list-style: none; }
+    .steps li {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--muted); font-weight: 500; white-space: nowrap;
+    }
+    .steps .num {
+      font-family: Inter, sans-serif; font-weight: 700; font-size: 11px;
+      width: 24px; height: 24px; border-radius: 50%;
+      display: grid; place-items: center;
+      border: 1px solid var(--line-strong); color: var(--muted);
+      transition: all .3s ease;
+    }
+    .steps .bar { flex: 1; height: 1px; background: var(--line-strong); min-width: 16px; }
+    .steps li.active { color: var(--text); }
+    .steps li.active .num { background: var(--teal); border-color: var(--teal); color: var(--ink); }
+    .steps li.done .num { border-color: var(--teal); color: var(--teal-hi); }
+
+    .card h2 { font-size: 20px; font-weight: 700; margin: 0 0 6px; letter-spacing: .02em; }
+    .card .hint { font-size: 13px; color: var(--muted); margin: 0 0 26px; }
+
+    /* 入力欄 */
+    .field { margin-bottom: 22px; }
+    .field label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 14px; font-weight: 700; margin-bottom: 8px;
+    }
+    .req {
+      font-size: 11px; font-weight: 700; color: var(--teal-hi);
+      border: 1px solid rgba(62,158,142,.5); border-radius: 4px; padding: 0 6px; line-height: 18px;
+    }
+    .field input {
+      width: 100%; height: 54px;
+      background: var(--field); color: var(--text);
+      border: 1px solid var(--line-strong); border-radius: var(--radius);
+      padding: 0 16px; font: inherit; font-size: 16px;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    .field input::placeholder { color: #5D6B74; }
+    .field input:hover { border-color: #3A4554; }
+    .field input:focus {
+      outline: none; border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(62,158,142,.18);
+      background: #111720;
+    }
+    .field.invalid input { border-color: var(--error); box-shadow: 0 0 0 4px rgba(240,138,126,.12); }
+    .err { display: none; font-size: 13px; color: var(--error); margin-top: 8px; }
+    .field.invalid .err { display: block; }
+
+    .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+    .privacy {
+      font-size: 12.5px; color: var(--muted); line-height: 1.7;
+      border-top: 1px solid var(--line); padding-top: 18px; margin: 6px 0 24px;
+    }
+
+    /* ボタン */
+    .btn {
+      width: 100%; height: 56px; border-radius: var(--radius);
+      font: inherit; font-size: 16px; font-weight: 700; letter-spacing: .06em;
+      cursor: pointer; border: 1px solid transparent;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      transition: transform .15s ease, background .2s, box-shadow .2s, border-color .2s;
+    }
+    .btn-primary {
+      background: var(--teal); color: #041210;
+      box-shadow: 0 10px 30px rgba(62,158,142,.25);
+    }
+    .btn-primary:hover { background: var(--teal-hi); }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-primary[disabled] { opacity: .7; cursor: progress; }
+    .btn-ghost { background: transparent; color: var(--text); border-color: var(--line-strong); }
+    .btn-ghost:hover { border-color: var(--sub); }
+    .btn .arrow { transition: transform .2s; }
+    .btn-primary:hover .arrow { transform: translateX(3px); }
+    .btn-row { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 560px) { .btn-row { grid-template-columns: 1fr 1.6fr; } }
+
+    .spinner {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid rgba(4,18,16,.3); border-top-color: #041210;
+      animation: spin .8s linear infinite; display: none;
+    }
+    .loading .spinner { display: inline-block; }
+    .loading .arrow { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 確認画面 */
+    .confirm { margin: 0 0 26px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .confirm div { display: grid; grid-template-columns: 1fr; padding: 14px 18px; gap: 2px; }
+    .confirm div + div { border-top: 1px solid var(--line); }
+    .confirm dt { font-size: 12px; color: var(--muted); }
+    .confirm dd { margin: 0; font-size: 16px; font-weight: 500; overflow-wrap: anywhere; }
+    @media (min-width: 560px) {
+      .confirm div { grid-template-columns: 7em 1fr; align-items: baseline; }
+    }
+
+    .alert {
+      display: none; font-size: 13.5px; color: var(--error);
+      background: rgba(240,138,126,.08); border: 1px solid rgba(240,138,126,.3);
+      border-radius: 10px; padding: 10px 14px; margin: 0 0 18px;
+    }
+    .alert.show { display: block; }
+
+    /* 完了画面 */
+    .done { text-align: center; padding: 12px 0 8px; }
+    .check { width: 76px; height: 76px; margin: 4px auto 22px; display: block; }
+    .check circle { stroke: var(--teal); stroke-width: 2; fill: rgba(62,158,142,.08);
+      stroke-dasharray: 220; stroke-dashoffset: 220; animation: draw .7s ease forwards; }
+    .check path { stroke: var(--teal-hi); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 50; stroke-dashoffset: 50; animation: draw .45s .55s ease forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    .done h2 { font-size: clamp(17px, 5.4vw, 22px); text-wrap: balance; }
+    .done p { color: var(--sub); font-size: 14.5px; margin: 10px auto 0; max-width: 26em; }
+    .done .sent-to {
+      display: inline-block; margin-top: 22px; padding: 8px 16px;
+      border: 1px solid var(--line-strong); border-radius: 999px;
+      font-size: 13px; color: var(--sage); overflow-wrap: anywhere;
+    }
+
+    /* 画面切り替え */
+    .view { display: none; }
+    .view.show { display: block; animation: rise .45s cubic-bezier(.2,.7,.2,1); }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    .intro { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+    .card { animation: rise .6s .08s cubic-bezier(.2,.7,.2,1) both; }
+
+    footer {
+      position: relative; z-index: 1; text-align: center;
+      font-family: Inter, sans-serif; font-size: 11px; letter-spacing: .2em;
+      color: #4E5B63; padding: 0 24px 28px;
+    }
+
+    @media (max-width: 919px) {
+      .slab { display: none; }
+      .wrap { padding: 32px 20px 28px; gap: 28px; }
+    }
+    /* 小さいスマホ（幅380px以下） */
+    @media (max-width: 380px) {
+      .wrap { padding: 28px 16px 24px; }
+      .card { padding: 26px 20px 22px; }
+      .steps { gap: 6px; }
+      .steps .bar { min-width: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .check circle, .check path { stroke-dashoffset: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="slab" aria-hidden="true"></div>
+
+  <main class="wrap">
+    <section class="intro">
+      <p class="eyebrow">AI SURVIVAL SCHOOL</p>
+      <h1 class="brand">THE MONOLITH</h1>
+      <div class="rule"></div>
+      <p class="audience">関東経済産業局 ご担当者様</p>
+      <p class="lead">THE MONOLITH のご利用にあたり、アカウント発行のご案内先を登録してください。入力は1分ほどで完了します。</p>
+    </section>
+
+    <section class="card" aria-live="polite">
+      <ol class="steps" id="steps">
+        <li data-step="1" class="active"><span class="num">1</span>入力</li>
+        <li class="bar" aria-hidden="true"></li>
+        <li data-step="2"><span class="num">2</span>確認</li>
+        <li class="bar" aria-hidden="true"></li>
+        <li data-step="3"><span class="num">3</span>完了</li>
+      </ol>
+
+      <!-- 1. 入力 -->
+      <form class="view show" id="view-input" novalidate>
+        <h2>利用登録</h2>
+        <p class="hint">アカウントのご案内先を入力してください。</p>
+
+        <div class="field" id="f-name">
+          <label for="name">お名前 <span class="req">必須</span></label>
+          <input id="name" name="name" type="text" autocomplete="name" placeholder="例）山田 太郎" maxlength="60">
+          <p class="err">お名前を入力してください。</p>
+        </div>
+
+        <div class="field" id="f-email">
+          <label for="email">メールアドレス <span class="req">必須</span></label>
+          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="例）name@example.go.jp" maxlength="254">
+          <p class="err">メールアドレスの形式をご確認ください。</p>
+        </div>
+
+        <div class="hp" aria-hidden="true">
+          <label for="website">website</label>
+          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+
+        <p class="privacy">ご入力いただいた情報は、THE MONOLITH のアカウント発行およびご利用に関するご連絡のためにのみ使用します。</p>
+
+        <button type="submit" class="btn btn-primary">入力内容を確認する <span class="arrow">→</span></button>
+      </form>
+
+      <!-- 2. 確認 -->
+      <div class="view" id="view-confirm">
+        <h2>入力内容の確認</h2>
+        <p class="hint">メールアドレスに誤りがあるとご案内が届きません。もう一度ご確認ください。</p>
+        <div class="alert" id="alert" role="alert"></div>
+        <dl class="confirm">
+          <div><dt>お名前</dt><dd id="c-name"></dd></div>
+          <div><dt>メールアドレス</dt><dd id="c-email"></dd></div>
+        </dl>
+        <div class="btn-row">
+          <button type="button" class="btn btn-ghost" id="back">修正する</button>
+          <button type="button" class="btn btn-primary" id="send"><span class="spinner"></span>この内容で登録する <span class="arrow">→</span></button>
+        </div>
+      </div>
+
+      <!-- 3. 完了 -->
+      <div class="view" id="view-done">
+        <div class="done">
+          <svg class="check" viewBox="0 0 76 76" aria-hidden="true">
+            <circle cx="38" cy="38" r="35"></circle>
+            <path d="M24 39 l10 10 l19 -21"></path>
+          </svg>
+          <h2>ご登録ありがとうございます</h2>
+          <p>ご入力いただいたメールアドレス宛に、後日 THE MONOLITH のご利用案内をお送りします。このページは閉じていただいて問題ありません。</p>
+          <span class="sent-to" id="d-email"></span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>THE MONOLITH</footer>
+
+  <script>
+    (function () {
+      var API_URL = 'https://script.google.com/macros/s/AKfycbzH3f97HgG6E_LY9XlZ7pGHL1PLffx6WUFNolm9Xte9w7KlF8Sn1pDeHMM0aB7SFJEILg/exec';
+      var $ = function (id) { return document.getElementById(id); };
+      var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      var data = {};
+
+      function show(step) {
+        ['input', 'confirm', 'done'].forEach(function (v, i) {
+          $('view-' + v).classList.toggle('show', i + 1 === step);
+        });
+        document.querySelectorAll('#steps li[data-step]').forEach(function (li) {
+          var s = Number(li.dataset.step);
+          li.classList.toggle('active', s === step);
+          li.classList.toggle('done', s < step);
+        });
+        if (window.innerWidth < 920) {
+          document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+
+      function setInvalid(id, on, msg) {
+        var f = $('f-' + id);
+        f.classList.toggle('invalid', on);
+        if (msg) f.querySelector('.err').textContent = msg;
+        $(id).setAttribute('aria-invalid', on ? 'true' : 'false');
+      }
+
+      function validate() {
+        var name = $('name').value.replace(/\s+/g, ' ').trim();
+        var email = $('email').value.trim();
+        var ok = true;
+        if (!name) { setInvalid('name', true, 'お名前を入力してください。'); ok = false; }
+        else setInvalid('name', false);
+        if (!email) { setInvalid('email', true, 'メールアドレスを入力してください。'); ok = false; }
+        else if (!EMAIL_RE.test(email)) { setInvalid('email', true, 'メールアドレスの形式をご確認ください。'); ok = false; }
+        else setInvalid('email', false);
+        if (!ok) {
+          var first = document.querySelector('.field.invalid input');
+          if (first) first.focus();
+        }
+        return ok ? { name: name, email: email, website: $('website').value } : null;
+      }
+
+      // 入力中にエラー表示を解除
+      ['name', 'email'].forEach(function (id) {
+        $(id).addEventListener('input', function () {
+          if ($('f-' + id).classList.contains('invalid')) setInvalid(id, false);
+        });
+      });
+
+      $('view-input').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var v = validate();
+        if (!v) return;
+        data = v;
+        $('c-name').textContent = v.name;
+        $('c-email').textContent = v.email;
+        $('alert').classList.remove('show');
+        show(2);
+      });
+
+      $('back').addEventListener('click', function () { show(1); $('email').focus(); });
+
+      $('send').addEventListener('click', function () {
+        var btn = this;
+        if (btn.disabled) return;
+        btn.disabled = true;
+        btn.classList.add('loading');
+        $('alert').classList.remove('show');
+
+        function fail(msg) {
+          btn.disabled = false;
+          btn.classList.remove('loading');
+          $('alert').textContent = msg || '送信に失敗しました。時間をおいて、もう一度お試しください。';
+          $('alert').classList.add('show');
+        }
+
+        var ctrl = ('AbortController' in window) ? new AbortController() : null;
+        var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 25000);
+        fetch(API_URL, {
+          method: 'POST',
+          // text/plain にすると事前確認(CORS preflight)が発生しない
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(data),
+          credentials: 'omit',   // Googleのログイン状態を一切使わない（複数ログインでも動く）
+          redirect: 'follow',
+          signal: ctrl ? ctrl.signal : undefined
+        })
+          .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+          .then(function (res) {
+            clearTimeout(timer);
+            if (res && res.ok) {
+              $('d-email').textContent = data.email;
+              show(3);
+            } else if (res && res.field) {
+              btn.disabled = false; btn.classList.remove('loading');
+              show(1);
+              setInvalid(res.field, true, res.message);
+              $(res.field).focus();
+            } else {
+              fail(res && res.message);
+            }
+          })
+          .catch(function () { clearTimeout(timer); fail(); });
+      });
+    })();
+  </script>
+</body>
+</html>
